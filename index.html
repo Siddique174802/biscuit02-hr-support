@@ -1,47 +1,451 @@
 <!doctype html>
-<html>
+<html lang="bn">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Biscuit02 HR Support - Demo</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Biscuit 2 HR Support by Siddique</title>
+<style>
+  :root{
+    --soft-green: #A8D5BA;
+    --light-gold: #F8E1A1;
+    --bg: #F9F9F9;
+    --muted: #6b6b6b;
+    --card-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    --accent: #6aa07a;
+  }
+  body{font-family: "Helvetica Neue", Arial, sans-serif; margin:0; background:var(--bg); color:#222;}
+  header{background:linear-gradient(90deg,var(--soft-green),#c9e7d6 60%, var(--light-gold)); padding:18px 20px; display:flex; align-items:center; gap:16px; box-shadow:var(--card-shadow); position:sticky; top:0; z-index:10;}
+  header h1{margin:0; font-size:18px;}
+  main{max-width:1100px; margin:20px auto; padding:12px;}
+  .tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+  .tab{background:#fff; padding:10px 14px; border-radius:10px; cursor:pointer; box-shadow:var(--card-shadow);}
+  .tab.active{outline:3px solid rgba(255,235,179,0.8); transform:translateY(-2px);}
+  .layout{display:grid; grid-template-columns:1fr 380px; gap:16px;}
+  .card{background:#fff; border-radius:12px; padding:14px; box-shadow:var(--card-shadow);}
+  .notice{border-left:4px solid var(--soft-green); padding:10px; margin-bottom:10px; border-radius:6px;}
+  .notice h3{margin:0 0 6px 0; font-size:16px;}
+  .notice p{margin:0; color:var(--muted);}
+  .small{font-size:13px; color:var(--muted); margin-top:8px;}
+  .search-row{display:flex; gap:8px; margin-bottom:10px;}
+  input[type="text"], input[type="date"], input[type="file"], select, textarea{padding:8px 10px; border-radius:8px; border:1px solid #e2e2e2; width:100%;}
+  button{background:var(--accent); color:#fff; border:0; padding:8px 12px; border-radius:8px; cursor:pointer;}
+  button.ghost{background:transparent; color:var(--accent); border:1px solid var(--accent);}
+  .list{max-height:420px; overflow:auto; padding-right:6px;}
+  table{width:100%; border-collapse:collapse;}
+  th, td{padding:8px 6px; text-align:left; border-bottom:1px dashed #eee; font-size:14px;}
+  .muted{color:var(--muted); font-size:13px;}
+  .admin-lock{display:flex; gap:8px; align-items:center;}
+  .flex{display:flex; gap:8px; align-items:center;}
+  .badge{background:var(--light-gold); padding:4px 8px; border-radius:8px; font-weight:600;}
+  footer{margin-top:24px; text-align:center; color:var(--muted); font-size:13px;}
+  .modal-back{position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center; z-index:50;}
+  .modal{background:#fff; padding:18px; border-radius:10px; width:920px; max-width:96%; box-shadow:var(--card-shadow);}
+  .notice-actions{display:flex; gap:8px; margin-top:8px;}
+  .small-btn{padding:6px 8px; border-radius:8px; border:1px solid #ddd; background:#fafafa; cursor:pointer;}
+  @media (max-width:900px){ .layout{grid-template-columns:1fr; } }
+  .msg-list{max-height:220px; overflow:auto;}
+  .msg-item{padding:8px; border-bottom:1px solid #eee;}
+  .file-view{max-height:300px; overflow:auto; background:#fbfbfb; padding:8px; border-radius:8px; border:1px solid #eee;}
+</style>
 </head>
 <body>
-  <header><h1>Biscuit02 HR Support</h1></header>
+<header>
+  <div style="width:48px; height:48px; border-radius:10px; background:linear-gradient(180deg,var(--soft-green),#9ecfb0); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff">B2</div>
+  <div>
+    <h1>Biscuit 2 HR Support <span class="muted">by Siddique</span></h1>
+    <div style="font-size:13px; color:var(--muted)">Simple HR portal — Notice Board · Attendance · Ask HR · Admin</div>
+  </div>
+  <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+    <div class="badge">Soft Green · Light Gold</div>
+    <button id="adminOpenBtn" class="small-btn">Admin Login</button>
+  </div>
+</header>
 
-  <main>
-    <section id="login-section" class="card">
-      <h2>Admin Login</h2>
-      <input id="admin-user" placeholder="Username" />
-      <input id="admin-pass" placeholder="Password" type="password" />
-      <button id="btn-login">Login</button>
-      <p class="note">Demo credentials: <code>admin / password</code></p>
-    </section>
+<main>
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-tab="notice">Notice Board</div>
+    <div class="tab" data-tab="attendance">Attendance Summary</div>
+    <div class="tab" data-tab="ask">Ask HR</div>
+    <div class="tab" data-tab="admin">Admin Panel</div>
+  </div>
 
-    <section id="chat-section" class="card" style="display:none;">
-      <h2>Chat</h2>
-      <div id="chat-window" class="chat-window"></div>
-      <div class="chat-controls">
-        <input id="msg-input" placeholder="Type a message..." />
-        <button id="send-btn">Send</button>
+  <div class="layout">
+    <section id="mainArea">
+      <div id="notice" class="card view">
+        <h2 style="margin-top:0">Notice Board</h2>
+        <div class="small muted">নোটিস নিচে স্ক্রল করে দেখো — শুধু অ্যাডমিন এড/এডিট/ডিলিট করতে পারবে।</div>
+        <div style="margin-top:12px;">
+          <div class="list" id="noticesList"></div>
+        </div>
       </div>
+
+      <div id="attendance" class="card view" style="display:none; margin-top:16px;">
+        <h2 style="margin-top:0">Attendance Summary</h2>
+        <div class="small muted">Employee ID লিখে Search করো — রেকর্ড নীচে দেখাবে।</div>
+        <div style="margin-top:10px;" class="search-row">
+          <input id="searchEmpId" type="text" placeholder="Employee ID লিখো (উদাহরণ: EMP001)" />
+          <button id="searchBtn">Search</button>
+        </div>
+        <div id="attendanceResult" style="margin-top:12px;"></div>
+        <div style="margin-top:12px; color:var(--muted)">Admin panel থেকে CSV/JSON আপলোড করলে এখানে রেকর্ড দেখা যাবে।</div>
+      </div>
+
+      <div id="ask" class="card view" style="display:none; margin-top:16px;">
+        <h2 style="margin-top:0">Ask HR</h2>
+        <div class="small muted">প্রশ্ন পাঠাও — HR WhatsApp বা Inbox থেকে দেখা যাবে।</div>
+        <div style="margin-top:12px;">
+          <label class="small">Employee ID</label>
+          <input id="askEmpId" type="text" placeholder="আপনার Employee ID" />
+          <label class="small" style="margin-top:8px;">নাম</label>
+          <input id="askName" type="text" placeholder="আপনার নাম" />
+          <label class="small" style="margin-top:8px;">Phone (ওয়াটসঅ্যাপ নম্বর - country code সহ, উদাহরণ: 88017...)</label>
+          <input id="askPhone" type="text" placeholder="+88017XXXXXXXX" />
+          <label class="small" style="margin-top:8px;">প্রশ্ন / মেসেজ</label>
+          <textarea id="askMsg" rows="4" placeholder="আপনার প্রশ্ন লিখুন"></textarea>
+          <div style="margin-top:8px; display:flex; gap:8px;">
+            <button id="sendFormBtn">Send to HR (Save to Inbox)</button>
+            <button id="sendWhats" class="ghost">Open WhatsApp to HR</button>
+          </div>
+          <div class="small muted" style="margin-top:8px">WhatsApp খুললে HR নম্বরে প্রিফিল্ড মেসেজ যায়।</div>
+        </div>
+      </div>
+
+      <div id="admin" class="card view" style="display:none; margin-top:16px;">
+        <h2 style="margin-top:0">Admin Panel</h2>
+        <div class="small muted">Admin login করে Notice, Attendance, Files ও Inbox ম্যানেজ করো।</div>
+        <div style="margin-top:12px;">
+          <button id="adminManageBtn">Open Admin Modal</button>
+        </div>
+      </div>
+
     </section>
 
-    <section id="attendance-section" class="card" style="display:none;">
-      <h2>Attendance</h2>
-      <div class="upload-row">
-        <input type="file" id="csv-file" accept=".csv" />
-        <button id="upload-att">Upload Attendance CSV</button>
+    <aside>
+      <div class="card">
+        <h3 style="margin-top:0">Quick Actions</h3>
+        <div style="margin-top:8px;" class="flex">
+          <input id="quickEmp" type="text" placeholder="Employee ID (quick)" />
+          <button id="quickLookup" title="Quick lookup">Go</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <h4 style="margin:6px 0">Latest Notice</h4>
+          <div id="latestNotice" class="muted">No notices yet.</div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <h4 style="margin:6px 0">Admin Tools</h4>
+          <div class="admin-lock">
+            <button id="openAdminPanelBtn" class="small-btn">Open Admin Panel</button>
+            <button id="resetDataBtn" class="small-btn">Reset Demo Data</button>
+          </div>
+        </div>
       </div>
-      <div id="attendance-view" class="attendance-view"></div>
-      <button id="export-local">Export Local Cache (JSON)</button>
-    </section>
-  </main>
+
+      <div class="card" style="margin-top:12px;">
+        <h4 style="margin:6px 0">Info</h4>
+        <div class="muted">এই ডেমো LocalStorage ব্যবহার করে। সার্ভারে চালাতে হলে backend লাগবে।</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h4 style="margin:6px 0">Theme</h4>
+        <div class="muted">Soft Green + Light Gold — কোডে :root থেকে পরিবর্তন করো।</div>
+      </div>
+    </aside>
+  </div>
 
   <footer>
-    <small>Starter project — replace backend URL and secrets before production.</small>
+    Built for Siddique — Demo only. Data stored in your browser (LocalStorage).
   </footer>
+</main>
 
-  <script src="script.js"></script>
+<div id="modal" class="modal-back">
+  <div class="modal" role="dialog">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0">Admin Panel</h3>
+      <button id="closeModal" class="small-btn">Close</button>
+    </div>
+
+    <div style="margin-top:12px;">
+      <div id="adminArea">
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:300px;">
+            <h4 style="margin:6px 0">Notices</h4>
+            <label class="small">Date</label>
+            <input id="admNoticeDate" type="date" />
+            <label class="small" style="margin-top:6px;">Title</label>
+            <input id="admNoticeTitle" type="text" />
+            <label class="small" style="margin-top:6px;">Description</label>
+            <textarea id="admNoticeDesc" rows="4"></textarea>
+            <div class="notice-actions">
+              <button id="admAddNotice">Add Notice</button>
+              <button id="admClearNotice" class="small-btn">Clear</button>
+            </div>
+
+            <h4 style="margin:10px 0 6px 0">Upload Attendance File (CSV or JSON)</h4>
+            <div class="small muted">HRIS থেকে ডাউনলোড করা CSV/JSON আপলোড করো — সিস্টেম পার্স করে Attendance তে যোগ করবে।</div>
+            <input id="attendanceFile" type="file" accept=".csv,application/json" />
+            <div style="margin-top:8px;"><button id="uploadAttendanceBtn">Upload & Process</button></div>
+
+            <div style="margin-top:12px;">
+              <h4 style="margin:6px 0">Messages (Inbox)</h4>
+              <div class="msg-list" id="msgList"></div>
+            </div>
+          </div>
+
+          <div style="flex:1; min-width:300px;">
+            <h4 style="margin:6px 0">Quick Attendance Add</h4>
+            <label class="small">Employee ID</label>
+            <input id="admAttEmp" type="text" placeholder="EMP001" />
+            <label class="small" style="margin-top:6px;">Name</label>
+            <input id="admAttName" type="text" />
+            <label class="small" style="margin-top:6px;">Date</label>
+            <input id="admAttDate" type="date" />
+            <label class="small" style="margin-top:6px;">Status</label>
+            <select id="admAttStatus">
+              <option>Present</option>
+              <option>Absent</option>
+              <option>Leave</option>
+            </select>
+            <label class="small" style="margin-top:6px;">Overtime Hours</label>
+            <input id="admAttOT" type="text" placeholder="0" />
+            <div style="margin-top:8px;"><button id="admAddAttendance">Add Attendance</button></div>
+
+            <h4 style="margin:10px 0 6px 0">Uploaded Files (Preview)</h4>
+            <div class="file-view" id="uploadedFilesView">No files uploaded.</div>
+
+            <h4 style="margin:10px 0 6px 0">Admin Settings</h4>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <label class="small">Admin Password</label>
+              <input id="adminPwdSet" type="text" placeholder="type new password to change" />
+              <button id="saveAdminPwd" class="small-btn">Save</button>
+            </div>
+            <div class="muted" style="margin-top:8px">Default admin password is <strong>admin123</strong>. Change it here.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <h4 style="margin:6px 0">Export Data</h4>
+          <div style="display:flex; gap:8px;">
+            <button id="exportDataBtn" class="small-btn">Export Data (JSON)</button>
+            <button id="downloadCSVBtn" class="small-btn">Export Attendance CSV</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Client-side app with CSV/JSON upload, inbox, WhatsApp integration */
+function uid(){ return 'id'+Math.random().toString(36).slice(2,9); }
+function qs(s){return document.querySelector(s);}
+function qsa(s){return document.querySelectorAll(s);}
+
+const DEFAULT_HR_WHATSAPP = '+8801745901588';
+
+const defaultData = {
+  notices:[
+    {id:uid(), date: new Date().toISOString().slice(0,10), title:"Gate Pass Reminder", desc:"আগামীকাল সবাই গেট পাস জমা দিবে।" }
+  ],
+  attendance:[],
+  messages:[],
+  uploadedFiles:[],
+  adminPwd: "admin123"
+};
+
+function loadData(){ const raw = localStorage.getItem('biscuit2_hr_data'); if(!raw){ localStorage.setItem('biscuit2_hr_data', JSON.stringify(defaultData)); return defaultData;} try{return JSON.parse(raw);}catch(e){ localStorage.setItem('biscuit2_hr_data', JSON.stringify(defaultData)); return defaultData;} }
+function saveData(d){ localStorage.setItem('biscuit2_hr_data', JSON.stringify(d)); }
+
+function escapeHtml(s){ if(!s) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+function renderNotices(){
+  const data = loadData();
+  const container = qs('#noticesList'); container.innerHTML='';
+  if(!data.notices.length){ container.innerHTML='<div class="muted">কোনো নোটিস নেই</div>'; qs('#latestNotice').innerText='No notices yet.'; return; }
+  data.notices.slice().reverse().forEach(n=>{
+    const el = document.createElement('div'); el.className='notice';
+    el.innerHTML = `<h3>${escapeHtml(n.title)}</h3><div class="muted">${escapeHtml(n.date)}</div><p>${escapeHtml(n.desc)}</p>`;
+    container.appendChild(el);
+  });
+  const latest = data.notices[data.notices.length-1];
+  qs('#latestNotice').innerText = latest ? `${latest.date} — ${latest.title}` : 'No notices yet.';
+  renderUploadedFilesPreview();
+  populateMsgList();
+}
+
+function lookupAttendance(empId){
+  if(!empId) return {present:0, absent:0, leaves:0, overtime:0, rows:[]};
+  const data = loadData();
+  const rows = data.attendance.filter(a=>String(a.empId).toLowerCase()===String(empId).toLowerCase());
+  if(!rows.length) return {present:0, absent:0, leaves:0, overtime:0, rows:[]};
+  let present=0, absent=0, leaves=0, overtime=0;
+  rows.forEach(r=>{
+    const st = String(r.status||'').toLowerCase();
+    if(st.includes('present')) present++;
+    if(st.includes('absent')) absent++;
+    if(st.includes('leave')) leaves++;
+    overtime += Number(r.overtime||0);
+  });
+  return {present, absent, leaves, overtime, rows};
+}
+
+function renderAttendanceResult(empId){
+  const target = qs('#attendanceResult');
+  if(!empId){ target.innerHTML = '<div class="muted">Employee ID লিখে Search করো।</div>'; return; }
+  const res = lookupAttendance(empId);
+  if(res.rows.length === 0){ target.innerHTML = `<div class="muted">এই ID-এ কোনো রেকর্ড পাওয়া যায়নি।</div>`; return; }
+  let html = `<div style="display:flex; gap:12px; flex-wrap:wrap;">
+    <div class="card" style="padding:8px;"><strong>Present:</strong><div>${res.present}</div></div>
+    <div class="card" style="padding:8px;"><strong>Absent:</strong><div>${res.absent}</div></div>
+    <div class="card" style="padding:8px;"><strong>Leaves:</strong><div>${res.leaves}</div></div>
+    <div class="card" style="padding:8px;"><strong>Overtime:</strong><div>${res.overtime} hrs</div></div>
+  </div>
+  <div style="margin-top:10px;">
+    <h4 style="margin:6px 0">Records</h4>
+    <table><thead><tr><th>Date</th><th>Status</th><th>OT</th></tr></thead><tbody>`;
+  res.rows.slice().reverse().forEach(r=>{
+    html += `<tr><td>${r.date}</td><td>${escapeHtml(r.status)}</td><td>${r.overtime||0}</td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+  target.innerHTML = html;
+}
+
+function addNotice(date,title,desc){ const data=loadData(); data.notices.push({id:uid(),date,title,desc}); saveData(data); renderNotices(); }
+function addAttendanceRecord(empId,name,date,status,overtime){ const data=loadData(); data.attendance.push({id:uid(), empId, name, date, status, overtime: Number(overtime||0)}); saveData(data); }
+function addMessage(empId,name,phone,msg){ const data=loadData(); data.messages.push({id:uid(), empId, name, phone, msg, date:new Date().toISOString()}); saveData(data); populateMsgList(); alert('Message saved to inbox.'); }
+
+function populateMsgList(){
+  const data=loadData(); const el=qs('#msgList'); el.innerHTML='';
+  if(!data.messages.length){ el.innerHTML='<div class="muted">No messages</div>'; return; }
+  data.messages.slice().reverse().forEach(m=>{
+    const div=document.createElement('div'); div.className='msg-item';
+    div.innerHTML = `<div><strong>${escapeHtml(m.name||m.empId)}</strong> <span class="muted">(${escapeHtml(m.empId)})</span></div>
+      <div class="muted">${new Date(m.date).toLocaleString()}</div>
+      <div style="margin-top:6px">${escapeHtml(m.msg)}</div>
+      <div style="margin-top:6px; display:flex; gap:8px;">
+        <button class="small-btn" data-id="${m.id}" data-action="reply">Reply via WhatsApp</button>
+        <button class="small-btn" data-id="${m.id}" data-action="del">Delete</button>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function deleteMessage(id){ if(!confirm('Delete message?')) return; const data=loadData(); data.messages = data.messages.filter(x=>x.id!==id); saveData(data); populateMsgList(); }
+
+function openWhatsAppTo(number, text){ if(!number){ alert('Phone number missing for WhatsApp.'); return; } const clean = String(number).replace(/\D/g,''); const msg = encodeURIComponent(text||''); const url = 'https://wa.me/' + clean + '?text=' + msg; window.open(url, '_blank'); }
+
+function handleMsgAction(id, action){
+  const data=loadData();
+  const m = data.messages.find(x=>x.id===id);
+  if(!m) return;
+  if(action==='reply'){
+    const reply = prompt('Reply message (this will open WhatsApp):');
+    if(reply===null) return;
+    if(m.phone){ openWhatsAppTo(m.phone, 'Reply from HR: ' + reply); }
+    openWhatsAppTo(DEFAULT_HR_WHATSAPP, `Reply prepared for ${m.name||m.empId}: ${reply}`);
+  } else if(action==='del'){ deleteMessage(id); }
+}
+
+// CSV parsing
+function parseCSV(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length) return {header:[], rows:[]};
+  const header = lines[0].split(',').map(h=>h.trim());
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cols = lines[i].split(',').map(c=>c.trim());
+    const obj = {};
+    header.forEach((h,idx)=> obj[h] = cols[idx] || '');
+    rows.push(obj);
+  }
+  return {header, rows};
+}
+
+function processAttendanceFileContent(name, content, type){
+  const data = loadData();
+  const fileRecord = {id:uid(), name, uploadedAt: new Date().toISOString(), type};
+  try{
+    if(type==='json' || name.toLowerCase().endsWith('.json')){
+      const parsed = JSON.parse(content);
+      if(Array.isArray(parsed)){
+        parsed.forEach(r=>{
+          if(r.empId || r.EmployeeID || r.ID){
+            const empId = r.empId || r.EmployeeID || r.ID || r.EmpID || r.id || '';
+            data.attendance.push({id:uid(), empId, name: r.name || r.Name || '', date: r.date || r.Date || '', status: r.status || r.Status || 'Present', overtime: Number(r.overtime||r.OT||0)});
+          }
+        });
+      }
+      fileRecord.summary = Array.isArray(parsed) ? parsed.length + ' records' : 'parsed';
+    } else {
+      const parsed = parseCSV(content);
+      parsed.rows.forEach(r=>{
+        const empId = r.empId || r.EmployeeID || r.employee_id || r.EmpID || r.ID || r.id || r.emp || '';
+        const name = r.name || r.Name || r.employee || '';
+        const date = r.date || r.Date || r.attendance_date || '';
+        const status = r.status || r.Status || r.attStatus || 'Present';
+        const overtime = r.overtime || r.OT || r.Overtime || 0;
+        if(empId) data.attendance.push({id:uid(), empId, name, date, status, overtime: Number(overtime||0)});
+      });
+      fileRecord.summary = parsed.rows.length + ' rows';
+    }
+    data.uploadedFiles = data.uploadedFiles || [];
+    data.uploadedFiles.push(fileRecord);
+    saveData(data);
+    renderNotices();
+    alert('File processed and attendance added.');
+  } catch(e){
+    alert('Failed to process file: ' + e.message);
+  }
+}
+
+function renderUploadedFilesPreview(){
+  const data=loadData(); const el=qs('#uploadedFilesView');
+  if(!data.uploadedFiles || !data.uploadedFiles.length){ el.innerText = 'No files uploaded.'; return; }
+  el.innerHTML = data.uploadedFiles.slice().reverse().map(f=>`${f.uploadedAt.split('T')[0]} — ${f.name} (${f.summary||'processed'})`).join('<br>');
+}
+
+/* UI events */
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(!localStorage.getItem('biscuit2_hr_data')) localStorage.setItem('biscuit2_hr_data', JSON.stringify(defaultData));
+  renderNotices();
+  renderAttendanceResult('');
+
+  qsa('.tab').forEach(t=>{
+    t.addEventListener('click', ()=>{ qsa('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const tab=t.dataset.tab; qsa('.view').forEach(v=>v.style.display='none'); qs('#'+tab).style.display='block'; });
+  });
+
+  qs('#searchBtn').addEventListener('click', ()=>{ const id=qs('#searchEmpId').value.trim(); renderAttendanceResult(id); });
+  qs('#quickLookup').addEventListener('click', ()=>{ const id=qs('#quickEmp').value.trim(); if(!id){ alert('Employee ID লিখো।'); return;} document.querySelector('.tab[data-tab="attendance"]').click(); qs('#searchEmpId').value=id; renderAttendanceResult(id); });
+
+  qs('#sendFormBtn').addEventListener('click', ()=>{ const emp=qs('#askEmpId').value.trim(); const name=qs('#askName').value.trim(); const phone=qs('#askPhone').value.trim(); const msg=qs('#askMsg').value.trim(); if(!emp || !msg){ alert('Employee ID ও Message দিতে হবে।'); return;} addMessage(emp, name||'', phone||'', msg); qs('#askEmpId').value=''; qs('#askName').value=''; qs('#askPhone').value=''; qs('#askMsg').value=''; });
+
+  qs('#sendWhats').addEventListener('click', ()=>{ const hrNumber = DEFAULT_HR_WHATSAPP.replace(/\+/g,''); const emp=qs('#askEmpId').value.trim(); const name=qs('#askName').value.trim(); const msg = encodeURIComponent(`Hello HR, My Employee ID: ${emp} Name: ${name}. ` + (qs('#askMsg').value||'')); window.open('https://wa.me/' + hrNumber + '?text=' + msg, '_blank'); });
+
+  qs('#adminOpenBtn').addEventListener('click', ()=>{ const pwd=prompt('Admin password লিখো:'); if(pwd===null) return; const data=loadData(); if(pwd===data.adminPwd){ qs('#modal').style.display='flex'; document.body.style.overflow='hidden'; populateMsgList(); } else alert('Password ভুল হয়েছে।'); });
+  qs('#adminManageBtn').addEventListener('click', ()=>{ const pwd=prompt('Admin password লিখো:'); if(pwd===null) return; const data=loadData(); if(pwd===data.adminPwd){ qs('#modal').style.display='flex'; document.body.style.overflow='hidden'; populateMsgList(); } else alert('Password ভুল হয়েছে।'); });
+  qs('#closeModal').addEventListener('click', ()=>{ qs('#modal').style.display='none'; document.body.style.overflow='auto'; });
+
+  qs('#admAddNotice').addEventListener('click', ()=>{ const date=qs('#admNoticeDate').value || new Date().toISOString().slice(0,10); const title=qs('#admNoticeTitle').value.trim(); const desc=qs('#admNoticeDesc').value.trim(); if(!title||!desc){ alert('Title ও Description দিতে হবে।'); return;} addNotice(date,title,desc); qs('#admNoticeDate').value=''; qs('#admNoticeTitle').value=''; qs('#admNoticeDesc').value=''; alert('Notice added.'); });
+
+  qs('#admAddAttendance').addEventListener('click', ()=>{ const emp=qs('#admAttEmp').value.trim(); const name=qs('#admAttName').value.trim(); const date=qs('#admAttDate').value || new Date().toISOString().slice(0,10); const status=qs('#admAttStatus').value; const ot=qs('#admAttOT').value||0; if(!emp||!name){ alert('Employee ID ও Name দিতে হবে।'); return;} addAttendanceRecord(emp,name,date,status,ot); qs('#admAttEmp').value=''; qs('#admAttName').value=''; qs('#admAttDate').value=''; qs('#admAttOT').value=''; alert('Attendance added.'); });
+
+  qs('#msgList').addEventListener('click',(e)=>{ const btn=e.target.closest('button'); if(!btn) return; const id=btn.dataset.id; const action=btn.dataset.action; handleMsgAction(id,action); });
+
+  qs('#uploadAttendanceBtn').addEventListener('click', ()=>{ const f=qs('#attendanceFile').files[0]; if(!f){ alert('কোনো ফাইল সিলেক্ট করা হয়নি।'); return;} const reader=new FileReader(); reader.onload = function(ev){ const txt = ev.target.result; const name = f.name; const type = name.toLowerCase().endsWith('.json') ? 'json' : 'csv'; processAttendanceFileContent(name, txt, type); }; reader.readAsText(f); });
+
+  qs('#exportDataBtn').addEventListener('click', ()=>{ const d=loadData(); const blob = new Blob([JSON.stringify(d,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='biscuit2_hr_data.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+  qs('#downloadCSVBtn').addEventListener('click', ()=>{ const data=loadData(); const rows = data.attendance || []; if(!rows.length){ alert('No attendance records.'); return;} const header = ['empId','name','date','status','overtime']; const csv = [header.join(',')].concat(rows.map(r=>[r.empId,r.name,r.date,r.status,r.overtime].map(v=>`"${String(v||'')}"`).join(','))).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='attendance_export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+
+  qs('#saveAdminPwd').addEventListener('click', ()=>{ const p=qs('#adminPwdSet').value.trim(); if(!p){ alert('পাসওয়ার্ড লিখো।'); return;} const d=loadData(); d.adminPwd=p; saveData(d); qs('#adminPwdSet').value=''; alert('Admin password updated.'); });
+
+  qs('#resetDataBtn').addEventListener('click', ()=>{ if(!confirm('Demo data reset করো?')) return; localStorage.removeItem('biscuit2_hr_data'); location.reload(); });
+
+  populateMsgList();
+});
+
+function handleMsgAction(id, action){ const data=loadData(); const m=data.messages.find(x=>x.id===id); if(!m) return; if(action==='reply'){ const reply = prompt('Reply message (this will open WhatsApp):'); if(reply===null) return; if(m.phone) openWhatsAppTo(m.phone, 'Reply from HR: ' + reply); openWhatsAppTo(DEFAULT_HR_WHATSAPP, `Reply prepared for ${m.name||m.empId}: ${reply}`); } else if(action==='del'){ deleteMessage(id); } }
+</script>
 </body>
 </html>
