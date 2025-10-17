@@ -1,0 +1,5 @@
+# Future features
+- Add Leave App
+- Add IOM (In/Out Movement)
+- Add holiday calendar
+- Extend AI helper
