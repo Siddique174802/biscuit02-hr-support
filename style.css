@@ -1,2 +1,14 @@
-body {font-family: Arial, sans-serif; background: #f8f9fa; color: #333;}
-h1 {color: #1e7e34;}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{background:#0f1720;color:#e6eef8;margin:0;padding:20px}
+header{margin-bottom:12px}
+h1{font-size:20px}
+.card{background:#111827;padding:16px;border-radius:8px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
+input, button{padding:8px;margin:6px 0;border-radius:6px;border:1px solid #334155;background:#0b1220;color:#e6eef8}
+button{cursor:pointer}
+.chat-window{height:220px;overflow:auto;background:#071022;padding:8px;border-radius:6px}
+.chat-controls{display:flex;gap:8px}
+.attendance-view{max-height:300px;overflow:auto;background:#071022;padding:8px;border-radius:6px}
+.note{color:#94a3b8;font-size:13px}
+.upload-row{display:flex;gap:8px;align-items:center}
+footer{margin-top:18px;color:#94a3b8}
+code{background:#0b1220;padding:2px 6px;border-radius:4px}

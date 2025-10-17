@@ -1,15 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Biscuit 02 HR⚡ABS</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Biscuit02 HR Support - Demo</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>Biscuit 02 HR⚡ABS</h1>
-<p>Welcome to your smart HR corner.</p>
-<!-- Dashboard, OT Report, Attendance, Ask HR, AI helper -->
-<script src="script.js"></script>
+  <header><h1>Biscuit02 HR Support</h1></header>
+
+  <main>
+    <section id="login-section" class="card">
+      <h2>Admin Login</h2>
+      <input id="admin-user" placeholder="Username" />
+      <input id="admin-pass" placeholder="Password" type="password" />
+      <button id="btn-login">Login</button>
+      <p class="note">Demo credentials: <code>admin / password</code></p>
+    </section>
+
+    <section id="chat-section" class="card" style="display:none;">
+      <h2>Chat</h2>
+      <div id="chat-window" class="chat-window"></div>
+      <div class="chat-controls">
+        <input id="msg-input" placeholder="Type a message..." />
+        <button id="send-btn">Send</button>
+      </div>
+    </section>
+
+    <section id="attendance-section" class="card" style="display:none;">
+      <h2>Attendance</h2>
+      <div class="upload-row">
+        <input type="file" id="csv-file" accept=".csv" />
+        <button id="upload-att">Upload Attendance CSV</button>
+      </div>
+      <div id="attendance-view" class="attendance-view"></div>
+      <button id="export-local">Export Local Cache (JSON)</button>
+    </section>
+  </main>
+
+  <footer>
+    <small>Starter project — replace backend URL and secrets before production.</small>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,42 @@
+Future features
+- Add Leave App
+- Add IOM (In/Out Movement)
+- Add holiday calendar
+- Extend AI helper
+
+Prompts & Notes (for Siddique)
+----------------------------
+Sample prompts to use with the AI Helper (offline demo -> replace with LLM later):
+- "Summarize OT for Production team"
+- "Who has highest OT hours?"
+- "Average OT hours per employee?"
+- "Convert this message to professional English: 'ami kal chhuti nibo'"
+- "Translate: 'Salary payment delayed' to Bangla"
+
+Backend brief (how to connect)
+------------------------------
+1) Node.js + Express + MySQL:
+   - Create REST endpoints: /api/attendance, /api/ot-report
+   - Use mysql2 or Sequelize
+   - Frontend: fetch('/api/ot-report?month=October&year=2025')
+
+2) Firebase / Firestore:
+   - Configure Firebase SDK in frontend or use callable cloud functions
+   - Secure with Firebase Auth and Firestore rules
+
+Deployment
+----------
+- GitHub Pages: push files to a repo and enable Pages (branch: main). Static site -> HTTPS provided.
+- Vercel: connect repo and deploy (static). Auto HTTPS.
+
+Files included & purpose
+------------------------
+- index.html: main single-page app
+- style.css: styles
+- script.js: app logic (localStorage demo)
+- README.md: this file
+- prompts_and_notes.txt: suggestions & future steps
+
+Notes:
+- The demo frontend stores attendance and messages in localStorage when no backend is configured.
+- Replace APi endpoints and configure backend before sharing publicly.
