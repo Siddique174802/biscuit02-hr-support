@@ -1,12 +1,1 @@
-:root{--bg:#f7f7fb;--card:#fff;--accent:#2b6cb0}
-body{font-family: Arial, sans-serif;background:var(--bg);margin:0;color:#222}
-header{background:var(--accent);color:#fff;padding:1rem}
-header h1{margin:0;font-size:1.2rem}
-.container{padding:1rem;display:grid;grid-template-columns:1fr;gap:1rem}
-.card{background:var(--card);padding:1rem;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-input,textarea{width:100%;padding:.5rem;margin:.4rem 0;border:1px solid #ddd;border-radius:6px}
-button{background:var(--accent);color:#fff;padding:.6rem 1rem;border:0;border-radius:6px;cursor:pointer}
-ul{list-style:none;padding:0;margin:0}
-li{padding:.6rem;border-bottom:1px solid #eee}
-.muted{color:#666;font-size:.9rem}
-a{color:var(--accent)}
+body{font-family:Arial,sans-serif;}

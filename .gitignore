@@ -1,5 +1,4 @@
 node_modules/
 .firebase/
-.env
-functions/node_modules/
+.functions/node_modules/
 .DS_Store
