@@ -1,46 +1,28 @@
-Biscuit 2 HR Support — Upload Package
-=====================================
+Biscuit 2 HR Support — Final Upload Package (with Admin Reply)
+===============================================================
 
-Files included:
-- index.html  --> Single-file web app (HTML/CSS/JS). Upload this to your repo or server.
-- README.txt  --> This file with instructions.
+Files:
+- index.html  --> Single-file web app (HTML/CSS/JS) with Admin Inbox + Reply-to-Employee via WhatsApp (wa.me)
+- README.txt  --> This file
 
-What this package does
-----------------------
-- Client-side HR portal. Data is stored in browser LocalStorage.
-- Features:
-  - Notice Board (Admin can Add/Edit/Delete)
-  - Attendance Summary (Employees search by Employee ID)
-  - Ask HR: staff can send message to Inbox and optionally open WhatsApp to HR
-  - Admin Panel: upload Attendance CSV/JSON exported from HRIS, quick attendance add, inbox view and reply via WhatsApp, export data.
+How it works (important)
+- Client-side app: data stored in browser LocalStorage under key 'biscuit2_hr_data'.
+- Employees use Ask HR to send messages (they can include phone). Messages appear in Admin Inbox.
+- Admin opens Admin Panel (Admin Login password default: admin123).
+- In Inbox, each message has a Reply input + "Reply" button:
+  - Clicking "Reply" opens WhatsApp (wa.me) to the employee phone (if provided) with the reply text.
+  - If employee phone not provided, admin is prompted to enter phone number.
+  - A copy of the reply is also opened to the HR admin number (+8801745901588) for record keeping.
+- Admin can also upload Attendance CSV/JSON (exported from HRIS) which is parsed and stored locally.
 
-WhatsApp integration
---------------------
-- Default HR WhatsApp number is: +8801745901588
-- When replying to messages, the app opens WhatsApp Web/mobile with a prefilled message. No API keys are used.
+Deploy:
+- Upload index.html to your server or GitHub repo. This file runs as a static page.
+- For company-wide use (multiple employees), it's recommended to deploy a server-backed version (I can help).
 
-How to use with your HRIS download
----------------------------------
-1. From your HRIS (e.g. OTReport or attendance export), export CSV or JSON.
-2. Upload that file in Admin -> Upload Attendance File.
-3. The app will try common column names: empId, EmployeeID, ID, name, Name, date, Date, status, Status, overtime, OT.
-4. After upload, employee records become searchable by Employee ID.
-
-Deploying
----------
-- Option A: Upload index.html to your existing GitHub repo and enable GitHub Pages (Settings -> Pages) or host on any static server.
-- Option B: Place index.html on your company webserver (e.g., in a folder) and serve as a static page.
-
-Security note
--------------
-- This version is for local/demo use. For production (company-wide) usage you should:
-  - Move data storage to a secure server and DB.
-  - Implement server-side authentication & access control.
-  - Use HTTPS and secure hosting.
-  - Consider integrating directly with HRIS via APIs (if available).
-
-If you want, I can:
-- Convert this to a server-backed app (Node.js + Express + PostgreSQL) and provide deployment steps.
-- Help map your HRIS export format to the CSV expected columns.
+Notes & Next Steps:
+- This is a functional final client-side package. For multiple concurrent users and persistent shared storage use a backend + DB (I have a production package ready if needed).
+- If you want, I can:
+  - Convert this to a server-backed app and deploy on DigitalOcean/Render.
+  - Integrate WhatsApp Business API for automated outgoing/incoming messages (requires provider account).
 
 Prepared for: Siddique

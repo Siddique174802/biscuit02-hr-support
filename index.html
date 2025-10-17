@@ -43,9 +43,10 @@
   .notice-actions{display:flex; gap:8px; margin-top:8px;}
   .small-btn{padding:6px 8px; border-radius:8px; border:1px solid #ddd; background:#fafafa; cursor:pointer;}
   @media (max-width:900px){ .layout{grid-template-columns:1fr; } }
-  .msg-list{max-height:220px; overflow:auto;}
+  .msg-list{max-height:360px; overflow:auto;}
   .msg-item{padding:8px; border-bottom:1px solid #eee;}
   .file-view{max-height:300px; overflow:auto; background:#fbfbfb; padding:8px; border-radius:8px; border:1px solid #eee;}
+  .reply-input{width:100%; padding:8px; border-radius:8px; border:1px solid #ddd; margin-top:6px;}
 </style>
 </head>
 <body>
@@ -98,7 +99,7 @@
           <input id="askEmpId" type="text" placeholder="আপনার Employee ID" />
           <label class="small" style="margin-top:8px;">নাম</label>
           <input id="askName" type="text" placeholder="আপনার নাম" />
-          <label class="small" style="margin-top:8px;">Phone (ওয়াটসঅ্যাপ নম্বর - country code সহ, উদাহরণ: 88017...)</label>
+          <label class="small" style="margin-top:8px;">Phone (WhatsApp নম্বর - country code সহ, উদাহরণ: +88017...)</label>
           <input id="askPhone" type="text" placeholder="+88017XXXXXXXX" />
           <label class="small" style="margin-top:8px;">প্রশ্ন / মেসেজ</label>
           <textarea id="askMsg" rows="4" placeholder="আপনার প্রশ্ন লিখুন"></textarea>
@@ -238,7 +239,7 @@
 </div>
 
 <script>
-/* Client-side app with CSV/JSON upload, inbox, WhatsApp integration */
+/* Final client-side app with admin inbox + reply-to-employee via WhatsApp (wa.me) */
 function uid(){ return 'id'+Math.random().toString(36).slice(2,9); }
 function qs(s){return document.querySelector(s);}
 function qsa(s){return document.querySelectorAll(s);}
@@ -321,11 +322,12 @@ function populateMsgList(){
   if(!data.messages.length){ el.innerHTML='<div class="muted">No messages</div>'; return; }
   data.messages.slice().reverse().forEach(m=>{
     const div=document.createElement('div'); div.className='msg-item';
-    div.innerHTML = `<div><strong>${escapeHtml(m.name||m.empId)}</strong> <span class="muted">(${escapeHtml(m.empId)})</span></div>
-      <div class="muted">${new Date(m.date).toLocaleString()}</div>
+    div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${escapeHtml(m.name||m.empId)}</strong> <span class="muted">(${escapeHtml(m.empId)})</span></div><div class="muted">${new Date(m.date).toLocaleString()}</div></div>
       <div style="margin-top:6px">${escapeHtml(m.msg)}</div>
-      <div style="margin-top:6px; display:flex; gap:8px;">
-        <button class="small-btn" data-id="${m.id}" data-action="reply">Reply via WhatsApp</button>
+      <div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+        <input class="reply-input" placeholder="Type reply here (optional)" data-id="${m.id}" />
+        <button class="small-btn" data-id="${m.id}" data-action="reply">Reply (to employee)</button>
+        <button class="small-btn" data-id="${m.id}" data-action="copy">Copy number</button>
         <button class="small-btn" data-id="${m.id}" data-action="del">Delete</button>
       </div>`;
     el.appendChild(div);
@@ -334,18 +336,36 @@ function populateMsgList(){
 
 function deleteMessage(id){ if(!confirm('Delete message?')) return; const data=loadData(); data.messages = data.messages.filter(x=>x.id!==id); saveData(data); populateMsgList(); }
 
-function openWhatsAppTo(number, text){ if(!number){ alert('Phone number missing for WhatsApp.'); return; } const clean = String(number).replace(/\D/g,''); const msg = encodeURIComponent(text||''); const url = 'https://wa.me/' + clean + '?text=' + msg; window.open(url, '_blank'); }
+function openWhatsAppTo(number, text){ if(!number){ alert('Phone number missing for WhatsApp.'); return; } const clean = String(number).replace(/\D/g,''); if(!clean) { alert('Invalid phone number'); return; } const msg = encodeURIComponent(text||''); const url = 'https://wa.me/' + clean + '?text=' + msg; window.open(url, '_blank'); }
 
 function handleMsgAction(id, action){
   const data=loadData();
   const m = data.messages.find(x=>x.id===id);
   if(!m) return;
   if(action==='reply'){
-    const reply = prompt('Reply message (this will open WhatsApp):');
-    if(reply===null) return;
-    if(m.phone){ openWhatsAppTo(m.phone, 'Reply from HR: ' + reply); }
-    openWhatsAppTo(DEFAULT_HR_WHATSAPP, `Reply prepared for ${m.name||m.empId}: ${reply}`);
-  } else if(action==='del'){ deleteMessage(id); }
+    // read reply input adjacent to the message (find input with data-id)
+    const input = document.querySelector('.reply-input[data-id="'+id+'"]');
+    let replyText = '';
+    if(input) replyText = input.value.trim();
+    if(!replyText){
+      // if empty, prompt for quick reply
+      const p = prompt('Write reply to send via WhatsApp (this will open wa.me):');
+      if(p===null) return;
+      replyText = p;
+    }
+    // prefer employee phone, else ask admin to enter phone
+    const phone = m.phone || prompt('Employee phone missing. Enter phone with country code (e.g. +88017...):');
+    if(!phone) return;
+    openWhatsAppTo(phone, replyText);
+    // also open a copy to HR admin number for record (optional)
+    openWhatsAppTo(DEFAULT_HR_WHATSAPP, `Replied to ${m.name||m.empId} (${m.empId}) : ${replyText}`);
+  } else if(action==='copy'){
+    const phone = m.phone || '';
+    if(!phone){ alert('No phone to copy'); return; }
+    navigator.clipboard.writeText(phone).then(()=> alert('Phone copied: ' + phone)).catch(()=> alert('Copy failed: ' + phone));
+  } else if(action==='del'){
+    deleteMessage(id);
+  }
 }
 
 // CSV parsing
@@ -371,10 +391,9 @@ function processAttendanceFileContent(name, content, type){
       const parsed = JSON.parse(content);
       if(Array.isArray(parsed)){
         parsed.forEach(r=>{
-          if(r.empId || r.EmployeeID || r.ID){
-            const empId = r.empId || r.EmployeeID || r.ID || r.EmpID || r.id || '';
-            data.attendance.push({id:uid(), empId, name: r.name || r.Name || '', date: r.date || r.Date || '', status: r.status || r.Status || 'Present', overtime: Number(r.overtime||r.OT||0)});
-          }
+          const empId = r.empId || r.EmployeeID || r.ID || r.EmpID || r.id || r.emp || '';
+          if(!empId) return;
+          data.attendance.push({id:uid(), empId, name: r.name || r.Name || '', date: r.date || r.Date || '', status: r.status || r.Status || 'Present', overtime: Number(r.overtime||r.OT||0)});
         });
       }
       fileRecord.summary = Array.isArray(parsed) ? parsed.length + ' records' : 'parsed';
@@ -445,7 +464,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   populateMsgList();
 });
 
-function handleMsgAction(id, action){ const data=loadData(); const m=data.messages.find(x=>x.id===id); if(!m) return; if(action==='reply'){ const reply = prompt('Reply message (this will open WhatsApp):'); if(reply===null) return; if(m.phone) openWhatsAppTo(m.phone, 'Reply from HR: ' + reply); openWhatsAppTo(DEFAULT_HR_WHATSAPP, `Reply prepared for ${m.name||m.empId}: ${reply}`); } else if(action==='del'){ deleteMessage(id); } }
+function handleMsgAction(id, action){ const data=loadData(); const m=data.messages.find(x=>x.id===id); if(!m) return; if(action==='reply'){ const input = document.querySelector('.reply-input[data-id="'+id+'"]'); let replyText = ''; if(input) replyText = input.value.trim(); if(!replyText){ const p = prompt('Write reply to send via WhatsApp (this will open wa.me):'); if(p===null) return; replyText = p; } const phone = m.phone || prompt('Employee phone missing. Enter phone with country code (e.g. +88017...):'); if(!phone) return; openWhatsAppTo(phone, replyText); openWhatsAppTo(DEFAULT_HR_WHATSAPP, `Replied to ${m.name||m.empId} (${m.empId}) : ${replyText}`); } else if(action==='copy'){ const phone = m.phone || ''; if(!phone){ alert('No phone to copy'); return; } navigator.clipboard.writeText(phone).then(()=> alert('Phone copied: ' + phone)).catch(()=> alert('Copy failed: ' + phone)); } else if(action==='del'){ deleteMessage(id); } }
 </script>
 </body>
 </html>
