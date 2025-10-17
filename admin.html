@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Biscuit02 HR - Admin Panel</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+</head>
+<body>
+  <header><h1>Admin Panel</h1></header>
+  <main class="container">
+    <section class="card">
+      <h2>Messages</h2>
+      <ul id="admin-messages-list"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Reply</h2>
+      <label>Message ID</label>
+      <input id="reply-msg-id" />
+      <label>Reply Text</label>
+      <textarea id="reply-text"></textarea>
+      <button id="send-reply">রিপ্লাই পাঠাও</button>
+      <p id="admin-status" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2>Upload Attendance File (PDF / Excel / WPS)</h2>
+      <label>Employee ID</label>
+      <input id="file-employee-id" placeholder="EMP001" />
+      <input type="file" id="file-upload" accept=".pdf,.xls,.xlsx,.wps,.et,.dps" />
+      <button id="upload-file">Upload File</button>
+      <ul id="uploaded-files"></ul>
+    </section>
+
+    <section class="card">
+      <h2>HRIS Attendance Viewer</h2>
+      <label>Employee ID</label>
+      <input id="emp-id-att" placeholder="EMP001" />
+      <button id="load-attendance">Load Attendance</button>
+      <div style="height:600px;">
+        <iframe id="attendance-frame" width="100%" height="100%" style="border:1px solid #ddd"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="scripts/firebase-init.js"></script>
+  <script type="module" src="scripts/admin.js"></script>
+  <script type="module" src="scripts/files-admin.js"></script>
+  <script>
+    document.getElementById('load-attendance').addEventListener('click', () => {
+      const id = document.getElementById('emp-id-att').value.trim();
+      if (!id) return alert('Employee ID দিন');
+      const src = `http://hris.prangroup.com:8686/Pages/Attendance/OTReport.aspx?EmpID=${encodeURIComponent(id)}`;
+      document.getElementById('attendance-frame').src = src;
+    });
+  </script>
+</body>
+</html>
