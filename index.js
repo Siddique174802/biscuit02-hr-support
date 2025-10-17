@@ -1,1 +1,1 @@
-// Firebase functions + Twilio placeholder
+// Firebase Functions placeholder

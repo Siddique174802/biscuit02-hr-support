@@ -1,2 +1,2 @@
-# Functions
-Install dependencies and set Twilio config
+# Biscuit02 HR Module
+Complete merged module
